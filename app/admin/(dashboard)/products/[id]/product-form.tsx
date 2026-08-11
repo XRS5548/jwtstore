@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { saveProduct, type SaveProductState } from "../actions";
 import type { ProductRow } from "@/db/schema";
+import { CATEGORIES } from "@/lib/products";
 
 function LineField({
   label,
@@ -35,6 +36,14 @@ export function ProductForm({ product }: { product: ProductRow | null }) {
   const [state, formAction, pending] = useActionState<SaveProductState, FormData>(
     saveProduct,
     null
+  );
+
+  // Prebuilt categories + current product's category (agar list mein nahi hai)
+  const categoryOptions = Array.from(
+    new Set([
+      ...(product?.category ? [product.category] : []),
+      ...CATEGORIES,
+    ])
   );
 
   const specs = product?.specifications ?? {};
@@ -66,7 +75,19 @@ export function ProductForm({ product }: { product: ProductRow | null }) {
       <div className="grid gap-4 md:grid-cols-2">
         <div>
           <Label htmlFor="category">Category *</Label>
-          <Input id="category" name="category" required defaultValue={product?.category ?? ""} placeholder="e.g. Mobiles" />
+          <select
+            id="category"
+            name="category"
+            required
+            defaultValue={product?.category ?? CATEGORIES[0]}
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
+          >
+            {categoryOptions.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
         </div>
         <div>
           <Label htmlFor="badge">Badge</Label>

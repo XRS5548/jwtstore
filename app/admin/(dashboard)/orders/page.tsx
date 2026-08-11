@@ -5,6 +5,7 @@ import { orderItems, orders } from "@/db/schema";
 import { formatPrice } from "@/lib/utils";
 
 import { OrderStatusSelect } from "./order-status-select";
+import { OrderItemsDetails } from "./order-items-details";
 
 export const dynamic = "force-dynamic";
 
@@ -86,19 +87,10 @@ export default async function AdminOrdersPage() {
                         Txn ID: <span className="font-medium">{order.transactionId}</span>
                       </p>
                     ) : null}
-                    <p className="pt-2 font-semibold">Items</p>
-                    <ul className="space-y-1 text-muted-foreground">
-                      {items.map((item) => (
-                        <li key={item.id}>
-                          {item.quantity}× {item.name}{" "}
-                          <span className="font-medium">
-                            ({formatPrice(item.lineSubtotal)})
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
                   </div>
                 </div>
+
+                <OrderItemsDetails items={items} />
               </div>
             );
           })}

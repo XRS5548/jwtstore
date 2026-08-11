@@ -1,10 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 
-import { CartProvider } from "@/components/cart-provider";
-import { Footer } from "@/components/footer";
-import { Navbar } from "@/components/navbar";
-import { AnnouncementBar } from "@/components/announcement-bar";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/config";
 
 import { cn } from "@/lib/utils";
@@ -75,14 +71,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       )}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        <CartProvider>
-          <div className="flex min-h-screen flex-col">
-            <AnnouncementBar />
-            <Navbar />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </div>
-        </CartProvider>
+        {children}
       </body>
     </html>
   );

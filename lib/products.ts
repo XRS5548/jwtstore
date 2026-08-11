@@ -1,6 +1,4 @@
-﻿import { maxSize } from "zod";
-
-export type Product = {
+﻿export type Product = {
   id: string;
   name: string;
   slug: string;

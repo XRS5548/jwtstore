@@ -25,6 +25,26 @@ export const STORE_ADDRESS = process.env.STORE_ADDRESS ?? "";
 export const STORE_WHATSAPP = process.env.STORE_WHATSAPP ?? "";
 
 /* ------------------------------------------------------------------ */
+/* Admin dashboard                                                     */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Admin login credentials (from .env). No users table is used - the
+ * single admin account is configured via environment variables.
+ */
+export const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "admin@bigdeal.example.com";
+export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? "change-me";
+
+/**
+ * Secret used to sign the admin session cookie. Override it in .env with
+ * a long random string.
+ */
+export const ADMIN_SESSION_SECRET =
+  process.env.ADMIN_SESSION_SECRET ??
+  process.env.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY ??
+  "dev-insecure-session-secret-change-me";
+
+/* ------------------------------------------------------------------ */
 /* Payment configuration                                               */
 /* ------------------------------------------------------------------ */
 

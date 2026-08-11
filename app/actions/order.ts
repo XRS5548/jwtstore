@@ -2,6 +2,8 @@
 
 import crypto from "node:crypto";
 
+import { db } from "@/db";
+import { orderItems as orderItemsTable, orders } from "@/db/schema";
 import {
   sendCustomerOrderEmail,
   sendStoreOrderEmail,
@@ -119,18 +121,57 @@ export async function placeOrder(input: unknown): Promise<OrderResult> {
     transactionId: txn || undefined,
   };
 
+  // Persist the order to the database (used by the admin dashboard).
+  let savedToDb = false;
   try {
-    // Email is the source of truth for the order (no database).
+    await db.insert(orders).values({
+      id: order.orderId,
+      customerName: order.customer.name,
+      customerPhone: order.customer.phone,
+      customerEmail: order.customer.email,
+      address: order.address.address,
+      city: order.address.city,
+      state: order.address.state,
+      pincode: order.address.pincode,
+      landmark: order.address.landmark || null,
+      subtotal,
+      discount,
+      total: subtotal,
+      paymentMethod,
+      paymentStatus,
+      transactionId: txn || null,
+      orderDate: order.orderDate,
+    });
+    await db.insert(orderItemsTable).values(
+      order.items.map((item) => ({
+        orderId: order.orderId,
+        productId: item.productId,
+        name: item.name,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        lineSubtotal: item.lineSubtotal,
+      }))
+    );
+    savedToDb = true;
+  } catch (error) {
+    // Never fail the checkout just because the DB write failed.
+    console.error("[BIG DEAL] Order DB save failed:", error);
+  }
+
+  try {
+    // Email is still sent as a backup notification.
     await sendStoreOrderEmail(order);
     await sendCustomerOrderEmail(order);
   } catch (error) {
     // Log safely on the server only - never leak SMTP details to the client.
     console.error("[BIG DEAL] Order email sending failed:", error);
-    return {
-      success: false,
-      message:
-        "We could not submit your order right now. Please try again.",
-    };
+    if (!savedToDb) {
+      return {
+        success: false,
+        message:
+          "We could not submit your order right now. Please try again.",
+      };
+    }
   }
 
   return {
